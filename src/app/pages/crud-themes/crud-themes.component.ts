@@ -18,6 +18,7 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CheckboxModule } from 'primeng/checkbox';
 import { Product, ProductService } from '../service/product.service';
 import { Theme, ThemesService } from '@/shared/services/themes.service';
 
@@ -53,14 +54,15 @@ interface ExportColumn {
         TagModule,
         InputIconModule,
         IconFieldModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        CheckboxModule
     ],
     templateUrl: './crud-themes.component.html',
     styleUrls: ['./crud-themes.component.scss'],
     providers: [MessageService, ProductService, ConfirmationService, ThemesService]
 })
 export class CrudThemesComponent implements OnInit {
-    productDialog: boolean = false;
+    themeDialog: boolean = false;
 
     themes = signal<Theme[]>([]);
 
@@ -71,6 +73,10 @@ export class CrudThemesComponent implements OnInit {
     submitted: boolean = false;
 
     statuses!: any[];
+
+    localesString: string = '';
+
+    isViewMode: boolean = false;
 
     @ViewChild('dt') dt!: Table;
 
@@ -114,7 +120,10 @@ export class CrudThemesComponent implements OnInit {
 
     openNew() {
         this.theme = {
-            titles: [],
+            titles: [{
+                iso_locale: '',
+                title: ''
+            }],
             id: '',
             created_at: '',
             locales: [],
@@ -122,13 +131,17 @@ export class CrudThemesComponent implements OnInit {
             formats_count: 0,
             is_featured: false
         };
+        this.localesString = '';
         this.submitted = false;
-        // this.themeDialog = true;
+        this.isViewMode = false;
+        this.themeDialog = true;
     }
 
     editTheme(theme: Theme) {
         this.theme = { ...theme };
-        // this.themeDialog = true;
+        this.localesString = theme.locales.join(', ');
+        this.isViewMode = true;
+        this.themeDialog = true;
     }
 
     deleteSelectedThemes() {
@@ -150,8 +163,9 @@ export class CrudThemesComponent implements OnInit {
     }
 
     hideDialog() {
-        // this.themeDialog = false;
+        this.themeDialog = false;
         this.submitted = false;
+        this.isViewMode = false;
     }
 
     deleteTheme(theme: Theme) {
@@ -216,6 +230,14 @@ export class CrudThemesComponent implements OnInit {
 
     saveTheme() {
         this.submitted = true;
+        
+        // Converter string de locales para array
+        if (this.localesString.trim()) {
+            this.theme.locales = this.localesString.split(',').map(locale => locale.trim()).filter(locale => locale);
+        }
+
+        console.log(this.theme);
+        
         let _themes = this.themes();
         if (this.theme.titles[0].title?.trim()) {
             if (this.theme.id) {
@@ -223,25 +245,27 @@ export class CrudThemesComponent implements OnInit {
                 this.themes.set([..._themes]);
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Theme Updated',
+                    summary: 'Sucesso',
+                    detail: 'Tema Atualizado',
                     life: 3000
                 });
             } else {
                 this.theme.id = this.createId();
-                // this.theme.image = 'theme-placeholder.svg';
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Theme Created',
+                    summary: 'Sucesso',
+                    detail: 'Tema Criado',
                     life: 3000
                 });
                 this.themes.set([..._themes, this.theme]);
             }
 
-            // this.themeDialog = false;
+            this.themeDialog = false;
             this.theme = {
-                titles: [],
+                titles: [{
+                    iso_locale: '',
+                    title: ''
+                }],
                 id: '',
                 created_at: '',
                 locales: [],
@@ -249,6 +273,7 @@ export class CrudThemesComponent implements OnInit {
                 formats_count: 0,
                 is_featured: false
             };
+            this.localesString = '';
         }
     }
 } 

@@ -35,9 +35,9 @@
     </ng-template>
     <ng-template #header>
         <tr>
-            <th style="width: 3rem">
+            <!-- <th style="width: 3rem">
                 <p-tableHeaderCheckbox />
-            </th>
+            </th> -->
             <th style="min-width: 16rem">ID</th>
             <th pSortableColumn="titles[0].title" style="min-width:16rem">
                 Title
@@ -57,9 +57,9 @@
     </ng-template>
     <ng-template #body let-theme>
         <tr>
-            <td style="width: 3rem">
+            <!-- <td style="width: 3rem">
                 <p-tableCheckbox [value]="theme" />
-            </td>
+            </td> -->
             <td style="min-width: 12rem">{{ theme.id }}</td>
             <td style="min-width: 16rem">{{ theme.titles[0].title }}</td>
             <td>{{ theme.locales }}</td>
@@ -67,70 +67,58 @@
             <td>{{ theme.formats_count }}</td>
             <td>
                 <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editTheme(theme)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteTheme(theme)" />
+                <!-- <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteTheme(theme)" /> -->
             </td>
         </tr>
     </ng-template>
 </p-table>
 
-<!-- <p-dialog [(visible)]="themeDialog" [style]="{ width: '450px' }" header="Theme Details" [modal]="true">
+<p-dialog [(visible)]="themeDialog" [style]="{ width: '600px' }" [header]="isViewMode ? 'Visualizar Tema' : 'Detalhes do Tema'" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
-            <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image" [alt]="product.image" class="block m-auto pb-4" *ngIf="product.image" />
             <div>
-                <label for="name" class="block font-bold mb-3">Name</label>
-                <input type="text" pInputText id="name" [(ngModel)]="product.name" required autofocus fluid />
-                <small class="text-red-500" *ngIf="submitted && !product.name">Name is required.</small>
+                <label for="title" class="block font-bold mb-3">Título</label>
+                <input type="text" pInputText id="title" [(ngModel)]="theme.titles[0].title" required autofocus fluid [disabled]="isViewMode" />
+                <small class="text-red-500" *ngIf="submitted && !theme.titles[0].title">Título é obrigatório.</small>
             </div>
+            
             <div>
-                <label for="description" class="block font-bold mb-3">Description</label>
-                <textarea id="description" pTextarea [(ngModel)]="product.description" required rows="3" cols="20" fluid></textarea>
-            </div>
-
-            <div>
-                <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
-                <p-select [(ngModel)]="product.inventoryStatus" inputId="inventoryStatus" [options]="statuses" optionLabel="label" optionValue="label" placeholder="Select a Status" fluid />
+                <label for="locale" class="block font-bold mb-3">Locale</label>
+                <input type="text" pInputText id="locale" [(ngModel)]="theme.titles[0].iso_locale" required fluid [disabled]="isViewMode" />
+                <small class="text-red-500" *ngIf="submitted && !theme.titles[0].iso_locale">Locale é obrigatório.</small>
             </div>
 
             <div>
-                <span class="block font-bold mb-4">Category</span>
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="product.category" />
-                        <label for="category1">Accessories</label>
-                    </div>
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="product.category" />
-                        <label for="category2">Clothing</label>
-                    </div>
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="product.category" />
-                        <label for="category3">Electronics</label>
-                    </div>
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="product.category" />
-                        <label for="category4">Fitness</label>
-                    </div>
-                </div>
+                <label for="locales" class="block font-bold mb-3">Locales Disponíveis</label>
+                <textarea id="locales" pTextarea [(ngModel)]="localesString" required rows="3" cols="20" fluid placeholder="Digite os locales separados por vírgula (ex: pt-BR, en-US, es-ES)" [disabled]="isViewMode"></textarea>
+                <small class="text-gray-600">Digite os locales separados por vírgula</small>
             </div>
 
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-6">
-                    <label for="price" class="block font-bold mb-3">Price</label>
-                    <p-inputnumber id="price" [(ngModel)]="product.price" mode="currency" currency="USD" locale="en-US" fluid />
+                    <label for="templates_count" class="block font-bold mb-3">Quantidade de Templates</label>
+                    <p-inputnumber id="templates_count" [(ngModel)]="theme.templates_count" [min]="0" fluid [disabled]="isViewMode" />
                 </div>
                 <div class="col-span-6">
-                    <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                    <p-inputnumber id="quantity" [(ngModel)]="product.quantity" fluid />
+                    <label for="formats_count" class="block font-bold mb-3">Quantidade de Formatos</label>
+                    <p-inputnumber id="formats_count" [(ngModel)]="theme.formats_count" [min]="0" fluid [disabled]="isViewMode" />
+                </div>
+            </div>
+
+            <div>
+                <span class="block font-bold mb-4">Status</span>
+                <div class="flex items-center gap-2">
+                    <p-checkbox id="is_featured" name="is_featured" [(ngModel)]="theme.is_featured" [binary]="true" [disabled]="isViewMode" />
+                    <label for="is_featured">Tema em Destaque</label>
                 </div>
             </div>
         </div>
     </ng-template>
 
     <ng-template #footer>
-        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="saveTheme()" />
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Salvar" icon="pi pi-check" (click)="saveTheme()" [disabled]="isViewMode" />
     </ng-template>
-</p-dialog> -->
+</p-dialog>
 
 <p-confirmdialog [style]="{ width: '450px' }" /> 
