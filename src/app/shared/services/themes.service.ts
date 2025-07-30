@@ -27,7 +27,7 @@ export class ThemesService {
     constructor(private storageService: StorageService) { }
 
     async getThemes(query: string = ''): Promise<any> {
-        const url = `${this.apiUrl}/themes?${query}`;
+        const url = `${this.apiUrl}/themes?products=ABxtKhOtkespxbaH44Ar&${query}`;
         const config = {
             headers: {
                 'Content-Type': 'application/json',
